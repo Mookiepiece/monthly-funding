@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Heebo');
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@100..900&display=swap');
 
 body {
   margin: 0;
@@ -15,6 +15,26 @@ html {
   height: 100%;
 }
 
+:root {
+  --air-0: #fff;
+  --air-1: #f0f0f0;
+  --air-2: #e8e8e8;
+
+  --text-1: #333;
+  --text-2: #666;
+  --text-3: #999;
+}
+
+.dark {
+  --air-0: #141415;
+  --air-1: #202022;
+  --air-2: #2b2b2d;
+
+  --text-1: #d5d5d3;
+  --text-2: #d5d5d3aa;
+  --text-3: #d5d5d388;
+}
+
 body {
   height: 100%;
   margin: 0;
@@ -23,9 +43,22 @@ body {
   line-height: 1.5;
 
   font-family: Heebo, system-ui, Avenir, Helvetica, Arial, sans-serif;
+
+  background: var(--air-0);
+  color: var(--text-1);
 }
 
 #app {
   margin: 0 auto;
   padding: 2rem;
+}
+
+.clr1 {
+  color: var(--text-1);
+}
+.clr2 {
+  color: var(--text-2);
+}
+.clr3 {
+  color: var(--text-3);
 }

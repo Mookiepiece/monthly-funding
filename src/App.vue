@@ -5,13 +5,13 @@ import ja from 'dayjs/locale/ja';
 import VButton from './VButton.vue';
 import TIcon from './TIcon.vue';
 import Cell from './Cell.vue';
-import Timeline from './Timeline.vue';
+import Timeline from './Capsule.vue';
 
 dayjs.extend(localeData);
 dayjs.locale(ja);
 
-const useCells = (_today: MaybeRef<Dayjs>) => {
-  return computed(() => {
+const useCells = (_today: MaybeRef<Dayjs>) =>
+  computed(() => {
     const today = unref(_today);
 
     const firstDayOfWeek = today.localeData().firstDayOfWeek();
@@ -26,7 +26,6 @@ const useCells = (_today: MaybeRef<Dayjs>) => {
 
     return [...prepend, ...cells, ...append];
   });
-};
 </script>
 
 <script setup lang="ts">
@@ -69,10 +68,15 @@ const budgets = ref([1500]);
 
 <template>
   <div>
-    <input type="number" v-model.number="salaryDay" />
-    <input type="number" v-model.number="budgets[0]" />
+    <form @submit.prevent="">
+      <label for="SalaryDay">Salary Day</label>
+      <input name="SalaryDay" type="number" v-model.number="salaryDay" />
+      <label for="SalaryDay">Monthly Funding</label>
+      <input name="MonthlyFunding" type="number" v-model.number="budgets[0]" />
+    </form>
   </div>
-  <div>
+  <Timeline :today :salaryDay :budgets />
+  <div style="width: min(800px, 100%)">
     <VButton
       @click="mav(-1)"
       @keydown.left.prevent="mav(-1)"
@@ -85,7 +89,7 @@ const budgets = ref([1500]);
     </VButton>
     <span>{{ model.month() + 1 }}</span>
   </div>
-  <div class="Calendar">
+  <div class="Calendar" style="width: min(800px, 100%)">
     <div
       class="columnheader"
       v-for="(i, index) in columns"
@@ -103,15 +107,13 @@ const budgets = ref([1500]);
       :budgets
     />
   </div>
-  <Timeline :today :salaryDay />
 </template>
 
 <style scoped>
 .Calendar {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  background: #f8f8f8;
-
+  background: var(--air-1);
 
   > * {
     padding: 10px;

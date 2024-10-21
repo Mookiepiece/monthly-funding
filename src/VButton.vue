@@ -13,7 +13,8 @@
   height: 30px;
   padding-inline: 10px;
 
-  background: #f8f8f8;
+  color: var(--text-1);
+  background: var(--air-1);
 
   &:has(> svg:only-child) {
     padding-inline: 0;
@@ -24,7 +25,7 @@
   }
 
   &:hover {
-    background: #e8e8e8;
+    background: var(--air-2);
   }
   &:active {
     filter: brightness(.95);

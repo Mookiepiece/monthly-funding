@@ -45,7 +45,7 @@ const remain = computed(() => {
   opacity: 0;
 }
 [data-today] {
-  background: #f1f1f1;
+  background: var(--air-0);
   box-shadow: inset 0 0 0 2px wheat;
 }
 
