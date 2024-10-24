@@ -8,12 +8,14 @@ const props = defineProps<{
   budgets: number[];
 }>();
 
-const [w, h, r] = [300, 150, 25];
+// w: width of the capsule, h: height of the capsule, r: radius of the capsule
+const [w, h, r] = [300, 150, 40];
+// map: the draw area
 const map = { H: h - 2 * r };
 
 const paint = computed(() => {
   const { today, salaryDay } = props;
-  const day = today.set('date', 20);
+  const day = today;
 
   const days = day.daysInMonth();
   const landmark = day.set('date', Math.min(salaryDay, days));
@@ -29,7 +31,7 @@ const paint = computed(() => {
 
   const capacity =
     (1 / season.e.diff(season.s, 'day')) * season.e.diff(day, 'day');
-  const balance = ~~(props.budgets[0] * capacity);
+  const balance = Number.parseInt('' + props.budgets[0] * capacity);
 
   const halfSpanWidth = w / days / 2;
   const span = halfSpanWidth;
@@ -61,10 +63,10 @@ const paint = computed(() => {
 
 <template>
   <div class="Capsule">
-    <div class="header clr1">
+    <div class="header clr-1">
       <span> [{{ today.format('MMMDD') }}] </span>
       <div class="right">
-        <span class="clr2"> {{ (paint.capacity * 100).toFixed(0) }}% </span>
+        <span class="clr-2"> {{ (paint.capacity * 100).toFixed(0) }}% </span>
         <span>
           {{
             paint.balance.toLocaleString('en-US', {
@@ -98,11 +100,13 @@ const paint = computed(() => {
 
 <style scoped>
 .Capsule {
+  position: relative;
   margin: auto;
   display: flex;
   flex-direction: column;
   width: 300px;
 
+  user-select: none;
 }
 
 svg {
@@ -110,22 +114,23 @@ svg {
   overflow: hidden;
   display: grid;
   place-content: center;
+  /* NOTE: 40px - 15px = 25px */
+  top: 15px;
   width: 300px;
   height: 150px;
   border-radius: 25px;
-
-  background: var(--air-1);
-  user-select: none;
 }
 
 .header {
-  width: 300px;
+  position: absolute;
+  top: 18px;
+  left: 0;
+  right: 0;
   display: flex;
-  padding-inline: 20px;
+  padding-inline: 12px;
   font-size: 15px;
   font-weight: 600;
   line-height: 20px;
-  transform: translateY(22px);
   z-index: 1;
 }
 

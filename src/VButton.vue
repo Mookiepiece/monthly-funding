@@ -10,8 +10,8 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  height: 30px;
-  padding-inline: 10px;
+  height: 40px;
+  padding: 0 10px;
 
   color: var(--text-1);
   background: var(--air-1);
@@ -28,7 +28,7 @@
     background: var(--air-2);
   }
   &:active {
-    filter: brightness(.95);
+    filter: brightness(0.95);
   }
 }
 </style>
