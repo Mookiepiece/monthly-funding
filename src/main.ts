@@ -1,7 +1,7 @@
 import { createApp } from 'vue';
 import { useDark } from '@vueuse/core';
 import './style.css';
-import App from './App.vue';
+import Main from './Main.vue';
 
 import dayjs from 'dayjs';
 import localeData from 'dayjs/plugin/localeData';
@@ -10,4 +10,4 @@ dayjs.extend(localeData);
 dayjs.locale(ja);
 
 useDark();
-createApp(App).mount('#app');
+createApp(Main).mount('#app');

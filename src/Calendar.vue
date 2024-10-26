@@ -1,18 +1,17 @@
 <script setup lang="ts">
-import { computed, Ref } from 'vue';
+import { computed, ref, Ref } from 'vue';
 import { Dayjs } from 'dayjs';
-
 import VButton from './VButton.vue';
 import TIcon from './TIcon.vue';
-import Cell from './Cell.vue';
+import { App } from './App';
 
-const model = defineModel<Dayjs>({ required: true });
-
-defineProps<{
+const props = defineProps<{
   today: Dayjs;
   salaryDay: number;
   budgets: number[];
 }>();
+
+const model = ref(props.today);
 
 const firstDayOfWeek = computed(() =>
   model.value.localeData().firstDayOfWeek(),
@@ -23,8 +22,17 @@ const columns = computed(() => {
   while (i--) raw.push(raw.shift()!);
   return raw;
 });
+
 const useCells = (_today: Ref<Dayjs>) =>
-  computed(() => {
+  computed<
+    (
+      | {
+          day: Dayjs;
+          remain: string;
+        }
+      | 0
+    )[]
+  >(() => {
     const today = _today.value;
 
     const firstDayOfWeek = today.localeData().firstDayOfWeek();
@@ -32,10 +40,27 @@ const useCells = (_today: Ref<Dayjs>) =>
     const day = today.startOf('M').day();
 
     const prepend = Array((day - firstDayOfWeek + 7) % 7).fill(0);
-    const cells = Array(days)
+    const _cells = Array(days)
       .fill(0)
       .map((_, i) => i + 1);
-    const append = Array(42 - prepend.length - cells.length).fill(0);
+    const append = Array(42 - prepend.length - _cells.length).fill(0);
+
+    const $month = model.value;
+    const landmark = $month.set(
+      'date',
+      Math.min(App.salaryDay, $month.daysInMonth()),
+    );
+
+    const cells = _cells.map(i => {
+      const day = $month.set('date', i);
+      const [start, end] = day.isBefore(landmark)
+        ? [landmark.subtract(1, 'month'), landmark]
+        : [landmark, landmark.add(1, 'month')];
+
+      const [diff, remainDays] = [end.diff(start, 'day'), end.diff(day, 'day')];
+      const remain = Number.parseInt('' + ((App.budgets[0] / diff) * remainDays));
+      return { day, remain };
+    });
 
     return [...prepend, ...cells, ...append];
   });
@@ -51,7 +76,7 @@ const mav = (delta: number) => {
 </script>
 
 <template>
-  <section class="Calendar" style="width: min(800px, 800px)">
+  <section class="Calendar">
     <header class="nav">
       <VButton
         @click="mav(-1)"
@@ -64,8 +89,6 @@ const mav = (delta: number) => {
         <TIcon i="chevron-right" />
       </VButton>
       <span>{{ model.month() + 1 }}</span>
-
-   
     </header>
     <div class="grid">
       <div
@@ -75,15 +98,14 @@ const mav = (delta: number) => {
       >
         {{ i }}
       </div>
-      <Cell
-        v-for="(cell, index) in cells"
-        :key="index"
-        :month="model"
-        :today
-        :cell
-        :salaryDay
-        :budgets
-      />
+
+      <template v-for="cell in cells" :data-day="cell">
+        <div v-if="cell === 0" data-day="0"></div>
+        <div v-else :data-today="cell.day.isSame(today, 'date') || undefined">
+          {{ cell.day.date() }}
+          <span class="Remain">{{ cell.remain }}</span>
+        </div>
+      </template>
     </div>
   </section>
 </template>
@@ -91,26 +113,53 @@ const mav = (delta: number) => {
 <style>
 .Calendar {
   padding: 15px 20px;
+  width: 800px;
   user-select: none;
+
+  border-radius: 25px;
+  background: var(--air-0);
 
   header {
     display: flex;
     align-items: center;
     gap: 10px;
   }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+
+    > * {
+      padding: 10px;
+    }
+
+    .columnheader {
+      font-size: 75%;
+      height: 45px;
+    }
+  }
+
+  [data-weekday='6'],
+  [data-weekday='0'] {
+    opacity: 0.5;
+  }
+
+  [data-day='0'] {
+    opacity: 0;
+  }
+  [data-today] {
+    background: var(--air-0);
+    box-shadow: inset 0 0 0 2px wheat;
+  }
+
+  .Remain {
+    font-size: 12px;
+  }
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
+@media (min-width: 1000px) {
+}
 
-  > * {
-    padding: 10px;
-  }
-
-  .columnheader {
-    font-size: 75%;
-    height: 45px;
-  }
+@media not (min-width: 700px) {
 }
 </style>

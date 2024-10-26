@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Dayjs } from 'dayjs';
 import { computed } from 'vue';
+import { App } from './App';
 
 const props = defineProps<{
   today: Dayjs;
@@ -68,11 +69,9 @@ const paint = computed(() => {
       <div class="right">
         <span class="clr-2"> {{ (paint.capacity * 100).toFixed(0) }}% </span>
         <span>
-          {{
+          {{ App.sign
+          }}{{
             paint.balance.toLocaleString('en-US', {
-              style: 'currency',
-              currency: 'JPY',
-              currencyDisplay: 'narrowSymbol',
               useGrouping: false,
               minimumFractionDigits: 0,
             })
@@ -107,6 +106,9 @@ const paint = computed(() => {
   width: 300px;
 
   user-select: none;
+
+  border-radius: 25px;
+  background: var(--air-0);
 }
 
 svg {

@@ -26,23 +26,13 @@ export const useDynamic = () => {
       const $item: HTMLElement = forwardRef(items).value;
       if (!$item) return;
       if ($open) {
-        if (appear) {
-          appear = false;
-          $island.style.transition = 'none';
-          visible.value = true;
-          copy($item);
-          requestAnimationFrame(() => {
-            $island.style.removeProperty('transition');
-          });
-          return;
-        }
-
-        fx.cssTransition($item, 'v-enter', {
+        fx.cssTransition($item, appear ? '__v-appear__' : 'v-enter', {
           from() {
+            appear &&= false;
             visible.value = true;
             copy($item);
-            $item.style.removeProperty('position');
-            $item.style.removeProperty('display');
+            // prettier-ignore
+            $item.querySelector<any>(':is(button, input, [tabindex]):not(:disabled, [tabindex="-1"])')?.focus?.();
           },
           to() {},
         });
@@ -54,8 +44,10 @@ export const useDynamic = () => {
             $item.style.left = `calc(50% - ${$item.offsetWidth / 2 + 'px'})`;
           },
           done() {
-            visible.value = false;
+            $item.style.removeProperty('position');
+            $item.style.removeProperty('display');
             $item.style.display = 'none';
+            visible.value = false;
           },
         });
       }
@@ -111,11 +103,6 @@ watchEffect(() => (props.dynamic.island.value = root.value), { flush: 'sync' });
   place-content: center;
 
   transition: all 0.3s var(--wave);
-
-  border-radius: 25px;
-  background: var(--air-0);
-
-  overflow: clip;
 }
 
 .Dynamic > * {
