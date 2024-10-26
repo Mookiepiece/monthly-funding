@@ -1,6 +1,10 @@
+import { reactive, toRef } from 'vue';
 import { useStorage } from '@vueuse/core';
 import dayjs from 'dayjs';
-import { reactive, toRef } from 'vue';
+import localeData from 'dayjs/plugin/localeData';
+dayjs.extend(localeData);
+import ja from 'dayjs/locale/ja';
+dayjs.locale(ja);
 
 const app = useStorage<{
   salaryDay: number;

@@ -5,13 +5,7 @@ import VButton from './VButton.vue';
 import TIcon from './TIcon.vue';
 import { App } from './App';
 
-const props = defineProps<{
-  today: Dayjs;
-  salaryDay: number;
-  budgets: number[];
-}>();
-
-const model = ref(props.today);
+const model = ref(App.today);
 
 const firstDayOfWeek = computed(() =>
   model.value.localeData().firstDayOfWeek(),
@@ -20,7 +14,10 @@ const columns = computed(() => {
   const raw = [...model.value.localeData().weekdaysMin()];
   let i = firstDayOfWeek.value;
   while (i--) raw.push(raw.shift()!);
-  return raw;
+  return raw.map((label, index) => ({
+    label,
+    value: (index + firstDayOfWeek.value) % 7,
+  }));
 });
 
 const useCells = (_today: Ref<Dayjs>) =>
@@ -58,7 +55,7 @@ const useCells = (_today: Ref<Dayjs>) =>
         : [landmark, landmark.add(1, 'month')];
 
       const [diff, remainDays] = [end.diff(start, 'day'), end.diff(day, 'day')];
-      const remain = Number.parseInt('' + ((App.budgets[0] / diff) * remainDays));
+      const remain = Number.parseInt('' + (App.budgets[0] / diff) * remainDays);
       return { day, remain };
     });
 
@@ -91,19 +88,17 @@ const mav = (delta: number) => {
       <span>{{ model.month() + 1 }}</span>
     </header>
     <div class="grid">
-      <div
-        class="columnheader"
-        v-for="(i, index) in columns"
-        :data-weekday="(index - firstDayOfWeek + 7) % 7"
-      >
-        {{ i }}
+      <div class="columnheader" v-for="i in columns" :data-weekday="i.value">
+        {{ i.label }}
       </div>
 
       <template v-for="cell in cells" :data-day="cell">
         <div v-if="cell === 0" data-day="0"></div>
-        <div v-else :data-today="cell.day.isSame(today, 'date') || undefined">
-          {{ cell.day.date() }}
-          <span class="Remain">{{ cell.remain }}</span>
+        <div
+          v-else
+          :data-today="cell.day.isSame(App.today, 'date') || undefined"
+        >
+          {{ cell.day.date() }}<span class="Remain">{{ cell.remain }}</span>
         </div>
       </template>
     </div>
@@ -125,18 +120,9 @@ const mav = (delta: number) => {
     gap: 10px;
   }
 
-  .grid {
+  :where(.grid) {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-
-    > * {
-      padding: 10px;
-    }
-
-    .columnheader {
-      font-size: 75%;
-      height: 45px;
-    }
   }
 
   [data-weekday='6'],
@@ -151,15 +137,56 @@ const mav = (delta: number) => {
     background: var(--air-0);
     box-shadow: inset 0 0 0 2px wheat;
   }
-
-  .Remain {
-    font-size: 12px;
-  }
 }
 
 @media (min-width: 1000px) {
+  .Calendar {
+    .grid {
+      > * {
+        padding: 10px 10px 0;
+        height: 50px;
+      }
+    }
+
+    .columnheader {
+      font-size: 75%;
+      height: 35px;
+    }
+
+    .Remain {
+      margin-inline: 5px;
+      font-size: 12px;
+    }
+  }
+}
+
+@media not (min-width: 1000px), not (min-height: 700px) {
+  .Calendar {
+    width: 360px;
+
+    .grid {
+      grid-template-rows: 20px repeat(6, 36px);
+
+      font-size: 12px;
+
+      > * {
+        padding: 2px;
+        color: var(--text-2);
+      }
+      .Remain {
+        display: block;
+        color: var(--text-1);
+      }
+    }
+  }
 }
 
 @media not (min-width: 700px) {
+  .Calendar {
+    padding: 15px 10px;
+    .grid {
+      font-size: 11px;
+    }
+  }
 }
 </style>

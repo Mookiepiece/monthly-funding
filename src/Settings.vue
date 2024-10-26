@@ -6,6 +6,7 @@ import VButton from './VButton.vue';
 import { forwardRef } from './utils/forwardRef';
 import { bagEffect, on } from './utils';
 import { App } from './App';
+import { localeUtils } from './localeUtils';
 
 const dynamic = useDynamic();
 
@@ -53,6 +54,13 @@ const budget = computed({
   get: () => App.budgets[0],
   set: v => (App.budgets = [Math.max(1, Math.min(10 ** 10, v ?? 0))]),
 });
+const localeValue = computed({
+  get: () => App.today.locale(),
+  set: v => {
+    localeUtils.setLocale(v);
+    App.today = App.today.locale(v);
+  },
+});
 </script>
 
 <template>
@@ -70,7 +78,12 @@ const budget = computed({
       ref="activated"
     >
       <div>
-        <VButton tabindex="-1" style="margin-bottom: 10px" data-close @click="open = false">
+        <VButton
+          tabindex="-1"
+          style="margin-bottom: 10px"
+          data-close
+          @click="open = false"
+        >
           <TIcon i="chevron-left" />
         </VButton>
       </div>
@@ -94,9 +107,18 @@ const budget = computed({
         <label for="Sign">Sign</label>
         <div>
           <!-- prettier-ignore -->
-          <label><input v-model="App.sign" @update:modelValue="console.log" type="radio" id="Sign" name="Sign" value="¥" />¥</label>
+          <label><input v-model="App.sign" type="radio" id="Sign" name="Sign" value="¥" />¥</label>
           <!-- prettier-ignore -->
-          <label><input v-model="App.sign" @update:modelValue="console.log" type="radio" name="Sign" value="$" />$</label>
+          <label><input v-model="App.sign" type="radio" name="Sign" value="$" />$</label>
+        </div>
+        <label for="Locale">Date Locale</label>
+        <div>
+          <!-- prettier-ignore -->
+          <label><input v-model="localeValue" type="radio" id="Locale" name="Locale" value="ja" />ja</label>
+          <!-- prettier-ignore -->
+          <label><input v-model="localeValue" type="radio" name="Locale" value="en" />en</label>
+          <!-- prettier-ignore -->
+          <label><input v-model="localeValue" type="radio" name="Locale" value="zh" />zh</label>
         </div>
         <button type="submit" tabindex="-1"></button>
       </form>

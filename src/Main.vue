@@ -5,17 +5,10 @@ import Calendar from './Calendar.vue';
 import { bagEffect, on } from './utils';
 import Settings from './Settings.vue';
 import { forwardRef } from './utils/forwardRef';
-import { App } from './App';
 </script>
 
 <script setup lang="ts">
-import dayjs from 'dayjs';
-import { ComponentInstance, computed, ref, toRef } from 'vue';
-
-const today = dayjs();
-
-const salaryDay = toRef(App, 'salaryDay');
-const budgets = toRef(App, 'budgets');
+import { ComponentInstance, computed, ref } from 'vue';
 
 // dynamic
 const capsule = ref<ComponentInstance<typeof Capsule>>();
@@ -78,9 +71,9 @@ bagEffect(bag => {
 
 <template>
   <Dynamic :dynamic ref="island">
-    <Capsule v-if="visibleA" ref="capsule" :today :salaryDay :budgets />
+    <Capsule v-if="visibleA" ref="capsule" />
     <!-- prettier-ignore -->
-    <Calendar v-if="visibleB" ref="calendar" :today :salaryDay :budgets />
+    <Calendar v-if="visibleB" ref="calendar" />
   </Dynamic>
   <Settings />
 </template>

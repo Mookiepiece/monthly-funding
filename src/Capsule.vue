@@ -1,13 +1,6 @@
 <script setup lang="ts">
-import { Dayjs } from 'dayjs';
 import { computed } from 'vue';
 import { App } from './App';
-
-const props = defineProps<{
-  today: Dayjs;
-  salaryDay: number;
-  budgets: number[];
-}>();
 
 // w: width of the capsule, h: height of the capsule, r: radius of the capsule
 const [w, h, r] = [300, 150, 40];
@@ -15,7 +8,7 @@ const [w, h, r] = [300, 150, 40];
 const map = { H: h - 2 * r };
 
 const paint = computed(() => {
-  const { today, salaryDay } = props;
+  const { today, salaryDay } = App;
   const day = today;
 
   const days = day.daysInMonth();
@@ -32,7 +25,7 @@ const paint = computed(() => {
 
   const capacity =
     (1 / season.e.diff(season.s, 'day')) * season.e.diff(day, 'day');
-  const balance = Number.parseInt('' + props.budgets[0] * capacity);
+  const balance = Number.parseInt('' + App.budgets[0] * capacity);
 
   const halfSpanWidth = w / days / 2;
   const span = halfSpanWidth;
@@ -65,7 +58,7 @@ const paint = computed(() => {
 <template>
   <div class="Capsule">
     <div class="header clr-1">
-      <span> [{{ today.format('MMMDD') }}] </span>
+      <span> [{{ App.today.format('MMMDD') }}] </span>
       <div class="right">
         <span class="clr-2"> {{ (paint.capacity * 100).toFixed(0) }}% </span>
         <span>
@@ -101,25 +94,22 @@ const paint = computed(() => {
 .Capsule {
   position: relative;
   margin: auto;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid: 100% / 100%;
   width: 300px;
+  height: 150px;
 
   user-select: none;
 
   border-radius: 25px;
   background: var(--air-0);
+
 }
 
 svg {
-  position: relative;
-  overflow: hidden;
-  display: grid;
   place-content: center;
   /* NOTE: 40px - 15px = 25px */
   top: 15px;
-  width: 300px;
-  height: 150px;
   border-radius: 25px;
 }
 

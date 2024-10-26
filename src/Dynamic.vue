@@ -3,22 +3,28 @@ import { MaybeRef } from 'vue';
 import { fx } from './utils';
 import { forwardRef } from './utils/forwardRef';
 
+// prettier-ignore
+const focusIn = (el:Element) => el.querySelector<any>(':is(button, input, [tabindex]):not(:disabled, [tabindex="-1"])')?.focus?.();
+
 export const useDynamic = () => {
-  const island = ref<any>();
-  const rect = reactive({
-    width: 0,
-    height: 0,
-  });
+  const island = ref<HTMLElement>();
+  const rect = reactive({ width: 0, height: 0 });
 
   const copy = ($: MaybeRef) => {
     const _ = unref($);
     [rect.width, rect.height] = [_.offsetWidth, _.offsetHeight];
   };
 
+  let _ro = null as HTMLElement | null;
+  const ro = new ResizeObserver(() => copy(_ro));
+  const observe = ($el: HTMLElement) => (
+    ro.disconnect(), ro.observe((_ro = $el))
+  );
+
   const register = (open: Ref<boolean>, items: Ref<any>, appear = false) => {
     const visible = ref(open.value);
 
-    const off = watchEffect(() => {
+    watchEffect(() => {
       const $island = island.value;
       if (!$island) return;
 
@@ -31,10 +37,12 @@ export const useDynamic = () => {
             appear &&= false;
             visible.value = true;
             copy($item);
-            // prettier-ignore
-            $item.querySelector<any>(':is(button, input, [tabindex]):not(:disabled, [tabindex="-1"])')?.focus?.();
+            focusIn($item);
+            ro.disconnect();
           },
-          to() {},
+          done() {
+            observe($item);
+          },
         });
       } else if (!$open) {
         fx.cssTransition($item, 'v-leave', {
@@ -55,7 +63,6 @@ export const useDynamic = () => {
 
     return {
       visible: computed(() => visible.value || open.value),
-      off,
     };
   };
 
@@ -114,9 +121,11 @@ watchEffect(() => (props.dynamic.island.value = root.value), { flush: 'sync' });
 
   &.v-leave-active {
     transition: all 0.3s var(--wave);
+    z-index: 2;
   }
   &.v-enter-active {
     transition: all 0.3s 0.1s var(--wave);
+    z-index: 1;
   }
 }
 </style>
