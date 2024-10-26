@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import Dynamic, { useDynamic } from './Dynamic.vue';
 import TIcon from './TIcon.vue';
 import VButton from './VButton.vue';
@@ -16,7 +16,10 @@ const activated = ref();
 const island = ref();
 const islandEl = forwardRef(island);
 
-const open = ref(false);
+const open = ref(App.fresh);
+
+if (App.fresh) watch(open, () => (App.fresh = false));
+
 const { visible: visibleA } = dynamic.register(
   computed(() => !open.value),
   idle,
@@ -97,10 +100,10 @@ const localeValue = computed({
           max="31"
           v-model="salaryDay"
         />
-        <label for="MonthlyFunding">Monthly Funding</label>
+        <label for="MonthlyAllowance">Monthly Allowance</label>
         <input
-          name="MonthlyFunding"
-          id="MonthlyFunding"
+          name="MonthlyAllowance"
+          id="MonthlyAllowance"
           type="number"
           v-model="budget"
         />

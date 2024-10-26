@@ -1,4 +1,5 @@
 import { computed, reactive, ref } from 'vue';
+import ja from 'dayjs/locale/ja';
 import { App } from './App';
 
 const p = ref<Promise<any> | null>(null);
@@ -15,9 +16,7 @@ const setLocale = (lo: string) => {
         .finally(() => (p.value = null));
       break;
     case 'ja':
-      p.value = import('dayjs/locale/ja')
-        .then(ja => (App.today = App.today.locale(ja.default)))
-        .finally(() => (p.value = null));
+      App.today = App.today.locale(ja);
       break;
   }
 };

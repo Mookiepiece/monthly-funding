@@ -10,10 +10,12 @@ const app = useStorage<{
   salaryDay: number;
   budgets: number[];
   sign: string;
+  fresh: boolean;
 }>('app', {
   salaryDay: 15,
   budgets: [1500],
   sign: '¥',
+  fresh: true,
 });
 
 export const App = reactive({
@@ -21,4 +23,5 @@ export const App = reactive({
   salaryDay: toRef(app.value, 'salaryDay'),
   budgets: toRef(app.value, 'budgets'),
   sign: toRef(app.value, 'sign'),
+  fresh: toRef(app.value, 'fresh'),
 });
