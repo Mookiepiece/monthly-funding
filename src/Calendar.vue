@@ -162,7 +162,7 @@ const mav = (delta: number) => {
     width: 360px;
 
     .grid {
-      grid-template-rows: 20px repeat(6, 36px);
+      grid-template-rows: 20px repeat(6, 35px);
 
       font-size: 12px;
 
