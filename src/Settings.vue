@@ -7,6 +7,8 @@ import { forwardRef } from './utils/forwardRef';
 import { bagEffect, on } from './utils';
 import { App } from './App';
 import { localeUtils } from './localeUtils';
+import VNumber from './VNumber.vue';
+import VSegmented from './VSegmented.vue';
 
 const dynamic = useDynamic();
 
@@ -49,13 +51,13 @@ bagEffect(bag => {
   }
 });
 
-const salaryDay = computed({
+const salaryDay = computed<number | null>({
   get: () => App.salaryDay,
-  set: v => (App.salaryDay = Math.max(1, Math.min(31, v ?? 0))),
+  set: v => (App.salaryDay = v ?? 1),
 });
-const budget = computed({
+const budget = computed<number | null>({
   get: () => App.budgets[0],
-  set: v => (App.budgets = [Math.max(1, Math.min(10 ** 10, v ?? 0))]),
+  set: v => (App.budgets = [v ?? 1]),
 });
 const localeValue = computed({
   get: () => App.today.locale(),
@@ -92,36 +94,28 @@ const localeValue = computed({
       </div>
       <form @submit.prevent="open = false">
         <label for="SalaryDay">Salary Day</label>
-        <input
+        <VNumber
           name="SalaryDay"
           id="SalaryDay"
-          type="number"
           min="1"
           max="31"
           v-model="salaryDay"
         />
         <label for="MonthlyAllowance">Monthly Allowance</label>
-        <input
+        <VNumber
           name="MonthlyAllowance"
           id="MonthlyAllowance"
-          type="number"
+          min="1"
+          max="1000000"
           v-model="budget"
         />
-        <label for="Sign">Sign</label>
+        <span>Sign</span>
         <div>
-          <!-- prettier-ignore -->
-          <label><input v-model="App.sign" type="radio" id="Sign" name="Sign" value="¥" />¥</label>
-          <!-- prettier-ignore -->
-          <label><input v-model="App.sign" type="radio" name="Sign" value="$" />$</label>
+          <VSegmented v-model="App.sign" :options="['¥', '$']" />
         </div>
-        <label for="Locale">Date Locale</label>
+        <span>Date Locale</span>
         <div>
-          <!-- prettier-ignore -->
-          <label><input v-model="localeValue" type="radio" id="Locale" name="Locale" value="ja" />ja</label>
-          <!-- prettier-ignore -->
-          <label><input v-model="localeValue" type="radio" name="Locale" value="en" />en</label>
-          <!-- prettier-ignore -->
-          <label><input v-model="localeValue" type="radio" name="Locale" value="zh" />zh</label>
+          <VSegmented v-model="localeValue" :options="['ja', 'en', 'zh']" />
         </div>
         <button type="submit" tabindex="-1"></button>
       </form>
@@ -130,11 +124,6 @@ const localeValue = computed({
 </template>
 
 <style scoped>
-.SettingsDynamicItem {
-  background: var(--air-0);
-  border-radius: 20px;
-}
-
 .SettingsFormWrap {
   display: flex;
   flex-direction: column;
@@ -142,10 +131,11 @@ const localeValue = computed({
 }
 
 form {
-  max-width: 300px;
+  width: 300px;
   display: grid;
   grid: auto auto / 110px 1fr;
-  gap: 2px 5px;
+  align-items: center;
+  gap: 5px 5px;
   font-size: 12px;
 
   [type='submit'] {

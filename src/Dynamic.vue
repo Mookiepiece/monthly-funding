@@ -1,7 +1,8 @@
 <script lang="ts">
 import { MaybeRef } from 'vue';
-import { fx } from './utils';
+import { bagEffect, fx } from './utils';
 import { forwardRef } from './utils/forwardRef';
+import { nextFrame } from './utils/scheduler';
 
 // prettier-ignore
 const focusIn = (el:Element) => el.querySelector<any>(':is(button, input, [tabindex]):not(:disabled, [tabindex="-1"])')?.focus?.();
@@ -24,7 +25,7 @@ export const useDynamic = () => {
   const register = (open: Ref<boolean>, items: Ref<any>, appear = false) => {
     const visible = ref(open.value);
 
-    watchEffect(() => {
+    bagEffect(bag => {
       const $island = island.value;
       if (!$island) return;
 
@@ -32,24 +33,39 @@ export const useDynamic = () => {
       const $item: HTMLElement = forwardRef(items).value;
       if (!$item) return;
       if ($open) {
-        fx.cssTransition($item, appear ? '__v-appear__' : 'v-enter', {
-          from() {
-            appear &&= false;
-            visible.value = true;
-            copy($item);
-            focusIn($item);
-            ro.disconnect();
-          },
-          done() {
-            observe($item);
-          },
+        $item.style.display = 'none';
+        // NOTE: prevent from accessing offsetWidth during the mount
+        // causing the browser paints and the enter animation broken due to it is called in this frame
+        // e.g. VSegmented
+        ro.disconnect();
+        let abort = false;
+        bag(() => (abort = true));
+        nextFrame(() => {
+          if (abort) return;
+          $item.style.removeProperty('display');
+          fx.cssTransition($item, appear ? '__v-appear__' : 'v-enter', {
+            from() {
+              appear &&= false;
+              visible.value = true;
+              copy($item);
+              focusIn($item);
+            },
+            done() {
+              observe($item);
+            },
+          });
         });
       } else if (!$open) {
         fx.cssTransition($item, 'v-leave', {
-          from() {
+          from(bag) {
             $item.style.position = 'absolute';
             $item.style.top = `calc(50% - ${$item.offsetHeight / 2 + 'px'})`;
             $item.style.left = `calc(50% - ${$item.offsetWidth / 2 + 'px'})`;
+            bag(() => {
+              $item.style.removeProperty('position');
+              $item.style.removeProperty('top');
+              $item.style.removeProperty('left');
+            });
           },
           done() {
             $item.style.removeProperty('position');
@@ -108,6 +124,9 @@ watchEffect(() => (props.dynamic.island.value = root.value), { flush: 'sync' });
 
   display: grid;
   place-content: center;
+
+  border-radius: 25px;
+  background: var(--air-0);
 
   transition: all 0.3s var(--wave);
 }

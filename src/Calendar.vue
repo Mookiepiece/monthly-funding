@@ -111,9 +111,6 @@ const mav = (delta: number) => {
   width: 800px;
   user-select: none;
 
-  border-radius: 25px;
-  background: var(--air-0);
-
   header {
     display: flex;
     align-items: center;

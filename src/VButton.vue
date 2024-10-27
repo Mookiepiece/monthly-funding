@@ -30,5 +30,8 @@
   &:active {
     filter: brightness(0.95);
   }
+  &:focus-visible {
+    outline: 2px solid var(---main);
+  }
 }
 </style>

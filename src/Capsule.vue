@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { App } from './App';
 
 // w: width of the capsule, h: height of the capsule, r: radius of the capsule
-const [w, h, r] = [300, 150, 40];
+const [w, h, r] = [300, 75, 0];
 // map: the draw area
 const map = { H: h - 2 * r };
 
@@ -75,14 +75,14 @@ const paint = computed(() => {
     <svg :viewBox="`0 0 ${w} ${h}`">
       <path
         :d="paint.skew"
-        stroke="#f32"
+        stroke="var(---main)"
         stroke-width="1"
         stroke-dasharray="6 4"
       />
       <path :d="paint.bar" fill="none" stroke="#78a6" stroke-width="3" />
       <path
         :d="paint.bar"
-        stroke="#f32"
+        stroke="var(---main)"
         stroke-width="3"
         :stroke-dasharray="paint.barDash"
       />
@@ -100,26 +100,20 @@ const paint = computed(() => {
   height: 150px;
 
   user-select: none;
-
-  border-radius: 25px;
-  background: var(--air-0);
-
 }
 
 svg {
-  place-content: center;
-  /* NOTE: 40px - 15px = 25px */
-  top: 15px;
-  border-radius: 25px;
+  position: relative;
+  top: 50px;
 }
 
 .header {
   position: absolute;
-  top: 18px;
+  top: 20px;
   left: 0;
   right: 0;
   display: flex;
-  padding-inline: 12px;
+  padding-inline: 25px;
   font-size: 15px;
   font-weight: 600;
   line-height: 20px;
