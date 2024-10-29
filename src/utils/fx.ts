@@ -1,4 +1,4 @@
-import { nextFrame } from './scheduler';
+import { nextFrame, onTimeout } from './scheduler';
 import { Bag, Bags } from './collection';
 import { on } from './on';
 
@@ -23,6 +23,9 @@ const transition = (el: HTMLElement | SVGElement, options: TransitionInit) => {
 
     options.to?.(bag);
 
+    const transitionDelays = window
+      .getComputedStyle(el)
+      .transitionDelay.split(',');
     const transitionDurations = window
       .getComputedStyle(el)
       .transitionDuration.split(',');
@@ -36,6 +39,28 @@ const transition = (el: HTMLElement | SVGElement, options: TransitionInit) => {
           options.done?.();
         }
       }),
+    );
+
+    // https://github.com/vuejs/core/blob/9a936aaec489c79433a32791ecf5ddb1739a62bd/packages/runtime-dom/src/components/Transition.ts#L357
+    const timeout =
+      Math.max(
+        ...transitionDelays.map((s, index) => {
+          let delay = Number(s.slice(0, -1));
+          let duration = Number(transitionDurations[index].slice(0, -1));
+
+          delay = Number.isNaN(delay) ? 0 : delay;
+          duration = Number.isNaN(duration) ? 0 : duration;
+
+          return (delay + duration) * 1000;
+        }),
+      ) + 1;
+
+    bag(
+      onTimeout(() => {
+        if (aborted) return;
+        bag();
+        options.done?.();
+      }, timeout),
     );
   });
 };

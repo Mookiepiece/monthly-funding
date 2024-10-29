@@ -33,28 +33,39 @@ export const useDynamic = () => {
       const $item: HTMLElement = forwardRef(items).value;
       if (!$item) return;
       if ($open) {
-        $item.style.display = 'none';
         // NOTE: prevent from accessing offsetWidth during the mount
         // causing the browser paints and the enter animation broken due to it is called in this frame
         // e.g. VSegmented
         ro.disconnect();
         let abort = false;
         bag(() => (abort = true));
-        nextFrame(() => {
-          if (abort) return;
-          $item.style.removeProperty('display');
-          fx.cssTransition($item, appear ? '__v-appear__' : 'v-enter', {
-            from() {
-              appear &&= false;
-              visible.value = true;
-              copy($item);
-              focusIn($item);
-            },
-            done() {
-              observe($item);
-            },
+
+        if (appear) {
+          appear = false;
+          $island.style.setProperty('transition', 'none');
+          nextFrame(() => $island.style.removeProperty('transition'));
+          visible.value = true;
+          copy($item);
+          observe($item);
+        } else {
+          $item.style.display = 'none';
+          nextFrame(() => {
+            if (abort) return;
+            $item.style.removeProperty('display');
+            fx.cssTransition($item, 'v-enter', {
+              from() {
+                appear &&= false;
+                visible.value = true;
+                copy($item);
+                focusIn($item);
+              },
+              done() {
+                if (abort) return;
+                observe($item);
+              },
+            });
           });
-        });
+        }
       } else if (!$open) {
         fx.cssTransition($item, 'v-leave', {
           from(bag) {

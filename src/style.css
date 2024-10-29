@@ -75,17 +75,13 @@ body {
   grid-area: 3 / 1 / 4 / 2;
 }
 
-@media not (min-height: 700px) {
+@media not (min-width: 700px), not (min-height: 700px) {
   #app {
     grid: 1fr 300px 195px 1fr / 1fr;
     min-height: 555px;
     min-width: 360px;
-  }
-}
-
-@media not (min-width: 444px) {
-  #app {
     padding-inline: 0;
+    overflow-x: clip;
   }
 }
 
