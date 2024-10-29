@@ -17,7 +17,7 @@ export const onStepWheel = (
     if (delta > 20) {
       delta = 0;
       cb(1);
-    } else if (delta < 20) {
+    } else if (delta < -20) {
       delta = 0;
       cb(-1);
     }
