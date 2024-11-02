@@ -43,16 +43,20 @@ bagEffect(bag => {
         cooldown = setTimeout(() => {
           cooldown = -1;
           cb();
-        }, 300);
+        }, 500);
       } else {
         cb();
-        cooldown = setTimeout(() => {}, 3000);
+        cooldown = setTimeout(() => {}, 500);
       }
     };
   };
 
   bag(on($island).mouseenter(throttleBoth(() => (open.value = 1))));
   bag(on($island).mouseleave(throttleBoth(() => (open.value = 0))));
+});
+bagEffect(bag => {
+  const $island: HTMLElement = islandEl.value;
+  if (!$island) return;
 
   if (!open.value) {
     bag(on($island).touchstart(() => (open.value = 1)));

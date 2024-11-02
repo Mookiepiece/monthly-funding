@@ -22,8 +22,8 @@ body,
 }
 
 :root {
-  --wave: cubic-bezier(0.66, 0, 0, 1.2);
-  --wave-s: cubic-bezier(0.66, 0, 0, 1);
+  --wave-ex: cubic-bezier(0.66, 0, 0, 1.2);
+  --wave: cubic-bezier(0.66, 0, 0, 1);
 
   --air-0: #fff;
   --air-1: #f8f8f9;

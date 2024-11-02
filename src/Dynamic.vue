@@ -48,7 +48,10 @@ export const useDynamic = () => {
           copy($item);
           observe($item);
         } else {
-          $item.style.display = 'none';
+
+          // NOTE: Do not interrupt leaving animation
+          if (!$item.classList.contains('v-leave-active'))
+            $item.style.display = 'none';
           nextFrame(() => {
             if (abort) return;
             $item.style.removeProperty('display');
@@ -139,7 +142,7 @@ watchEffect(() => (props.dynamic.island.value = root.value), { flush: 'sync' });
   border-radius: 25px;
   background: var(--air-0);
 
-  transition: all 0.3s var(--wave);
+  transition: all 0.3s var(--wave-ex);
 }
 
 .Dynamic > * {
@@ -154,7 +157,7 @@ watchEffect(() => (props.dynamic.island.value = root.value), { flush: 'sync' });
     z-index: 2;
   }
   &.v-enter-active {
-    transition: all 0.3s 0.1s var(--wave);
+    transition: all 0.3s 0.1s var(--wave-ex);
     z-index: 1;
   }
 }

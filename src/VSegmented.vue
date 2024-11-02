@@ -131,7 +131,7 @@ watchEffect(
     content: '';
   }
   &.ready::before {
-    transition: all 0.2s var(--wave-s);
+    transition: all 0.2s var(--wave);
   }
 
   &:has(:focus-visible) {
